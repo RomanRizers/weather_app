@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Прогноз погоды</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="{% static 'js/scripts.js' %}" defer></script>
+</head>
+<body>
+    <video autoplay muted loop class="background-video">
+        <source src="{% static 'videos/clouds.mp4' %}" type="video/mp4">
+    </video>
+    <div class="container">
+        <button class="back-button" onclick="window.location.href='/'">Назад</button>
+        <h1>Прогноз погоды</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="input-wrapper">
+                <input
+                    type="text"
+                    id="id_city"
+                    name="city"
+                    placeholder="Введите город"
+                >
+                <button type="submit" class="get-weather-button">
+                    &#x21d2;
+                </button>
+                <div id="suggestions"></div>
+            </div>
+        </form>
+
+        {% if weather_data %}
+            <div class="weather-info current-weather-info">
+                {% if weather_data.error %}
+                    <p>{{ weather_data.error }}</p>
+                {% else %}
+                    <h2>Текущая погода</h2>
+                    <p class="weather-metric">Температура: {{ weather_data.current.temperature }} °C</p>
+                    <p class="weather-metric">Осадки: {{ weather_data.current.rain }} мм</p>
+                    <p class="weather-metric">Скорость ветра: {{ weather_data.current.wind_speed }} км/ч</p>
+
+                    <h2>Прогноз погоды на 7 дней</h2>
+                    <ul>
+                        {% for day in weather_data.daily %}
+                            <li>
+                                <div class="date">{{ day.date }}</div>
+                                <span class="weather-metric">Максимальная температура: {{ day.max_temp }} °C</span>
+                                <span class="weather-metric">Минимальная температура: {{ day.min_temp }} °C</span>
+                                <span class="weather-metric">Максимальная вероятность осадков: {{ day.precipitation_probability_max }}%</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if search_history %}
+            <div class="search-history">
+                <div class="search-history-header">
+                    <h2>Недавние города</h2>
+                    <button class="clear-history-button" id="clear-history-button">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+                <div class="card-container">
+                    {% for city in search_history %}
+                        <a class="card" href="?selected_city={{ city }}">{{ city }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <script>
+        function clearHistory() {
+            $.post('{% url "index" %}', {clear_history: 'true', csrfmiddlewaretoken: '{{ csrf_token }}'}, function() {
+                location.reload();
+            });
+        }
+
+        document.getElementById('clear-history-button').addEventListener('click', function() {
+            clearHistory();
+        });
+    </script>
+</body>
+</html>
