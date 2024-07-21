@@ -175,7 +175,7 @@ if __name__ == "__main__":
   <img src="screenshots/screen6.png" alt="SQLite" />
 </p>
 
-### Основные функции
+## Основные функции
 
 #### 1. `index(request)`
 
