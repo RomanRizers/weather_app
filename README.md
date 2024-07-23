@@ -330,7 +330,7 @@ def autocomplete(request):
   <img src="screenshots/screen5.png" alt="Запуск тестов" />
 </p>
 
-## Контейнизация с Docker
+## Контейнеризация с Docker
 
 Заключительным этапом в создании WEB-сервиса была контейниразция Django проекта.
 Для этого были написаны _**Dockerfile**_ и _**docker-compose.yml**_
